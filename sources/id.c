@@ -51,16 +51,16 @@ od_id_mgr_seed(od_id_mgr_t *mgr)
 	}
 
 	rand_seed ^= rand_seed_2;
-	srand48_r(rand_seed, &mgr->rand_state);
+	//srand48_r(rand_seed, &mgr->rand_state);
 	return 0;
 }
 
 void
 od_id_mgr_generate(od_id_mgr_t *mgr, od_id_t *id, char *prefix)
 {
-	long int a, b;
-	lrand48_r(&mgr->rand_state, &a);
-	lrand48_r(&mgr->rand_state, &b);
+	long int a = 1, b = 2;
+	//lrand48(&mgr->rand_state, &a);
+	//lrand48(&mgr->rand_state, &b);
 
 	char seed[OD_ID_SEEDMAX];
 	memcpy(seed + 0, &a, 4);

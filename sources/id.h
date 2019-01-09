@@ -20,6 +20,19 @@ struct od_id
 	uint64_t id_b;
 };
 
+struct drand48_data
+{
+	unsigned short int __x[3];  /* Current state.  */
+	unsigned short int __old_x[3]; /* Old state.  */
+	unsigned short int __c;     /* Additive const. in congruential formula.  */
+	unsigned short int __init;  /* Flag for initializing.  */
+	unsigned long long int __a; /* Factor in congruential formula.  */
+};
+
+double drand48_r (unsigned short *_x) {
+	return erand48(_x);
+}
+
 struct od_id_mgr
 {
 	struct drand48_data rand_state;

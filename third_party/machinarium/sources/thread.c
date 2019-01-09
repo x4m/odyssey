@@ -39,8 +39,8 @@ int mm_thread_join(mm_thread_t *thread)
 
 int mm_thread_set_name(mm_thread_t *thread, char *name)
 {
-	int rc;
-	rc = pthread_setname_np(thread->id, name);
+	int rc = 0;
+	//rc = pthread_setname_np(thread->id, name);
 	return rc;
 }
 

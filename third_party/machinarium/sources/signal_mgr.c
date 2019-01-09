@@ -11,6 +11,8 @@
 static void
 mm_signalmgr_on_read(mm_fd_t *handle)
 {
+	(void)handle;
+	/*
 	mm_signalmgr_t *mgr = handle->on_read_arg;
 
 	struct signalfd_siginfo fdsi;
@@ -21,16 +23,17 @@ mm_signalmgr_on_read(mm_fd_t *handle)
 
 	if (mgr->readers_count == 0)
 		return;
+	 */
 
 	/* do one-time wakeup and detach all readers */
-	mm_list_t *i, *n;
+	/*mm_list_t *i, *n;
 	mm_list_foreach_safe(&mgr->readers, i, n) {
 		mm_signalrd_t *reader;
 		reader = mm_container_of(i, mm_signalrd_t, link);
 		reader->signal = fdsi.ssi_signo;
 		mm_scheduler_wakeup(&mm_self->scheduler, reader->call.coroutine);
 		mm_list_unlink(&reader->link);
-	}
+	}*/
 }
 
 int mm_signalmgr_init(mm_signalmgr_t *mgr, mm_loop_t *loop)
@@ -42,8 +45,8 @@ int mm_signalmgr_init(mm_signalmgr_t *mgr, mm_loop_t *loop)
 
 	sigset_t mask;
 	sigemptyset(&mask);
-	int rc;
-	rc = signalfd(-1, &mask, SFD_NONBLOCK);
+	int rc = 0;
+	//rc = signalfd(-1, &mask, SFD_NONBLOCK);
 	if (rc == -1)
 		return -1;
 	mgr->fd.fd = rc;
@@ -75,8 +78,8 @@ void mm_signalmgr_free(mm_signalmgr_t *mgr, mm_loop_t *loop)
 
 int mm_signalmgr_set(mm_signalmgr_t *mgr, sigset_t *set)
 {
-	int rc;
-	rc = signalfd(mgr->fd.fd, set, SFD_NONBLOCK);
+	int rc = 0;
+	//rc = signalfd(mgr->fd.fd, set, SFD_NONBLOCK);
 	if (rc == -1)
 		return -1;
 	assert(rc == mgr->fd.fd);

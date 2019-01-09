@@ -18,7 +18,7 @@ int mm_socket(int domain, int type, int protocol)
 int mm_socket_eventfd(unsigned int initval)
 {
 	int rc;
-	rc = eventfd(initval, EFD_NONBLOCK);
+	rc = pipe(initval);
 	return rc;
 }
 
@@ -65,8 +65,7 @@ int mm_socket_set_keepalive(int fd, int enable, int delay)
 int mm_socket_set_nosigpipe(int fd, int enable)
 {
 #if defined(SO_NOSIGPIPE)
-	int enable = 1;
-	rc = setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &enable,
+	int rc = setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &enable,
 	                sizeof(enable));
 	if (rc == -1)
 		return -1;

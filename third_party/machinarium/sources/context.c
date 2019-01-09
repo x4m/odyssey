@@ -75,7 +75,7 @@ mm_context_create(mm_context_t *context, mm_contextstack_t *stack,
 asm (
 	"\t.text\n"
 	"\t.globl mm_context_swap\n"
-	"\t.type x,@function\n"
+	//"\t.type x,@function\n"
 	"mm_context_swap:\n"
 	#if __amd64
 	"\tpushq %rbp\n"

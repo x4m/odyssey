@@ -4,9 +4,12 @@
  *
  * cooperative multitasking engine.
 */
-
+#ifdef LINUX
 #include <machinarium.h>
 #include <machinarium_private.h>
+#include <sys/epoll.h>
+#include <sys/eventfd.h>
+#include <sys/signalfd.h>
 
 typedef struct mm_epoll_t mm_epoll_t;
 
@@ -208,3 +211,4 @@ mm_pollif_t mm_epoll_if =
 	.write    = mm_epoll_write,
 	.del      = mm_epoll_del
 };
+#endif
