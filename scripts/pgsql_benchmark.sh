@@ -60,7 +60,8 @@ trap cleanup ERR INT TERM
 echo "Make temp build"
 mkdir tmpbuild
 cd tmpbuild
-cmake -DCMAKE_BUILD_TYPE=Release ../.. >/dev/null
+#cmake -DUSE_BORINGSSL=ON -DBORINGSSL_ROOT_DIR=/home/x4mmm/boringssl -DCMAKE_BUILD_TYPE=Release ../.. >/dev/null
+cmake -DOPENSSL_ROOT_DIR=/home/x4mmm/openssl-1.1.1a -DCMAKE_BUILD_TYPE=Release ../.. >/dev/null
 make -j 4 >/dev/null
 
 echo "Make temp DB"
