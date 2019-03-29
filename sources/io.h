@@ -46,9 +46,15 @@ od_io_prepare(od_io_t *io, machine_io_t *io_obj, int readahead)
 	rc = od_readahead_prepare(&io->readahead, readahead);
 	if (rc == -1)
 		return -1;
+
+	if (io->on_read)
+		machine_cond_free(io->on_read);
 	io->on_read = machine_cond_create();
 	if (io->on_read == NULL)
 		return -1;
+
+	if (io->on_write)
+		machine_cond_free(io->on_write);
 	io->on_write = machine_cond_create();
 	if (io->on_write == NULL)
 		return -1;
