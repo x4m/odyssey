@@ -72,6 +72,8 @@ enum
 	OD_LTLS_PROTOCOLS,
 	OD_LSTORAGE,
 	OD_LTYPE,
+    OD_LREPLICATION,
+    OD_LDBNAME,
 	OD_LDEFAULT,
 	OD_LDATABASE,
 	OD_LUSER,
@@ -157,6 +159,8 @@ od_config_keywords[] =
 	od_keyword("storage",              OD_LSTORAGE),
 	od_keyword("type",                 OD_LTYPE),
 	od_keyword("default",              OD_LDEFAULT),
+	od_keyword("replication",          OD_LREPLICATION),
+	od_keyword("dbname",               OD_LDBNAME),
 	/* database */
 	od_keyword("database",             OD_LDATABASE),
 	od_keyword("user",                 OD_LUSER),
