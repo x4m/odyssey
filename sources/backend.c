@@ -119,11 +119,33 @@ od_backend_startup(od_server_t *server, kiwi_params_t *route_params)
 {
 	od_instance_t *instance = server->global->instance;
 	od_route_t *route = server->route;
+	kiwi_fe_arg_t *argv;
 
-	kiwi_fe_arg_t argv[] = {
-		{ "user", 5 },     { route->id.user, route->id.user_len },
-		{ "database", 9 }, { route->id.database, route->id.database_len }
-	};
+	if (route->rule->storage->replication == OD_REPLICATION_PHYSICAL) {
+		kiwi_fe_arg_t options[] = {
+				{ "user", 5 },     { route->id.user, route->id.user_len },
+				{ "database", 9 }, { route->id.database, route->id.database_len },
+				{ "replication", 12}, {"on", 3 }
+		};
+		argv = options;
+	}
+	else if (route->rule->storage->replication == OD_REPLICATION_PHYSICAL) {
+		kiwi_fe_arg_t options[] = {
+				{ "user", 5 },     { route->id.user, route->id.user_len },
+				{ "database", 9 }, { route->id.database, route->id.database_len },
+				{ "replication", 12}, {"on", 3 },
+				{ "dbname", 7 }, { route->rule->storage->replication_dbname,
+					   strlen(route->rule->storage->replication_dbname) + 1 }
+		};
+		argv = options;
+	}
+	else {
+		kiwi_fe_arg_t options[] = {
+				{ "user", 5 },     { route->id.user, route->id.user_len },
+				{ "database", 9 }, { route->id.database, route->id.database_len }
+		};
+		argv = options;
+	}
 
 	machine_msg_t *msg;
 	msg = kiwi_fe_write_startup_message(NULL, 4, argv);

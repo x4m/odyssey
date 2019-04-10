@@ -106,7 +106,14 @@ od_rules_storage_copy(od_rule_storage_t *storage)
 	if (copy == NULL)
 		return NULL;
 	copy->storage_type = storage->storage_type;
+	copy->replication = storage->replication;
 	copy->name = strdup(storage->name);
+	if (storage->replication_dbname){
+		copy->replication_dbname = strdup(storage->replication_dbname);
+	}
+	else{
+		copy->replication_dbname = NULL;
+	}
 	if (copy->name == NULL)
 		goto error;
 	copy->type = strdup(storage->type);
@@ -394,6 +401,19 @@ od_rules_storage_compare(od_rule_storage_t *a, od_rule_storage_t *b)
 			return 0;
 	} else
 	if (a->tls_protocols || b->tls_protocols) {
+		return 0;
+	}
+
+	/* replication */
+	if (a->replication != b->replication)
+		return 0;
+
+	/* replication_dbname */
+	if (a->replication_dbname && b->replication_dbname) {
+		if (strcmp(a->replication_dbname, b->replication_dbname) != 0)
+			return 0;
+	} else
+	if (a->replication_dbname || b->replication_dbname) {
 		return 0;
 	}
 

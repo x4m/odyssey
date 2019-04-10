@@ -72,6 +72,8 @@ enum
 	OD_LTLS_PROTOCOLS,
 	OD_LSTORAGE,
 	OD_LTYPE,
+    OD_LREPLICATION,
+    OD_LDBNAME,
 	OD_LDEFAULT,
 	OD_LDATABASE,
 	OD_LUSER,
@@ -156,6 +158,8 @@ od_config_keywords[] =
 	/* storage */
 	od_keyword("storage",              OD_LSTORAGE),
 	od_keyword("type",                 OD_LTYPE),
+	od_keyword("replication",          OD_LREPLICATION),
+	od_keyword("dbname",               OD_LDBNAME),
 	od_keyword("default",              OD_LDEFAULT),
 	/* database */
 	od_keyword("database",             OD_LDATABASE),
@@ -358,6 +362,38 @@ error:
 	return false;
 }
 
+static bool
+od_config_reader_replication(od_config_reader_t *reader, od_replcation_type_t *value)
+{
+	od_token_t token;
+	int rc;
+	rc = od_parser_next(&reader->parser, &token);
+	if (rc != OD_PARSER_KEYWORD)
+		goto error;
+	od_keyword_t *keyword;
+	keyword = od_keyword_match(od_config_keywords, &token);
+	if (keyword == NULL)
+		goto error;
+	switch (keyword->id) {
+		case OD_LYES:
+			*value = OD_REPLICATION_PHYSICAL;
+			break;
+		case OD_LNO:
+			*value = OD_REPLICATION_DISABLED;
+			break;
+		case OD_LDATABASE:
+			*value = OD_REPLICATION_LOGICAL;
+			break;
+		default:
+			goto error;
+	}
+	return true;
+	error:
+	od_parser_push(&reader->parser, &token);
+	od_config_reader_error(reader, &token, "expected 'yes/no/database'");
+	return false;
+}
+
 static int
 od_config_reader_listen(od_config_reader_t *reader)
 {
@@ -493,6 +529,16 @@ od_config_reader_storage(od_config_reader_t *reader)
 		/* type */
 		case OD_LTYPE:
 			if (! od_config_reader_string(reader, &storage->type))
+				return -1;
+			continue;
+		/* dbname for replication */
+		case OD_LDBNAME:
+			if (! od_config_reader_string(reader, &storage->replication_dbname))
+				return -1;
+			continue;
+		/* replication type */
+		case OD_LREPLICATION:
+			if (! od_config_reader_replication(reader, &storage->replication))
 				return -1;
 			continue;
 		/* host */
