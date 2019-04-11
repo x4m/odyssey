@@ -43,10 +43,19 @@ typedef enum
 	OD_RULE_STORAGE_LOCAL
 } od_rule_storage_type_t;
 
+typedef enum
+{
+	OD_REPLICATION_DISABLED,
+	OD_REPLICATION_PHYSICAL,
+	OD_REPLICATION_LOGICAL,
+} od_replcation_type_t;
+
 struct od_rule_storage
 {
 	char                   *name;
 	char                   *type;
+	od_replcation_type_t    replication;
+	char				   *replication_dbname;
 	od_rule_storage_type_t  storage_type;
 	char                   *host;
 	int                     port;

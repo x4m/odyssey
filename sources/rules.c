@@ -106,7 +106,14 @@ od_rules_storage_copy(od_rule_storage_t *storage)
 	if (copy == NULL)
 		return NULL;
 	copy->storage_type = storage->storage_type;
+	copy->replication = storage->replication;
 	copy->name = strdup(storage->name);
+	if (storage->replication_dbname){
+		copy->replication_dbname = strdup(storage->replication_dbname);
+	}
+	else{
+		copy->replication_dbname = NULL;
+	}
 	if (copy->name == NULL)
 		goto error;
 	copy->type = strdup(storage->type);
@@ -397,6 +404,19 @@ od_rules_storage_compare(od_rule_storage_t *a, od_rule_storage_t *b)
 		return 0;
 	}
 
+	/* replication */
+	if (a->replication != b->replication)
+		return 0;
+
+	/* replication_dbname */
+	if (a->replication_dbname && b->replication_dbname) {
+		if (strcmp(a->replication_dbname, b->replication_dbname) != 0)
+			return 0;
+	} else
+	if (a->replication_dbname || b->replication_dbname) {
+		return 0;
+	}
+
 	return 1;
 }
 
@@ -661,6 +681,14 @@ od_rules_validate(od_rules_t *rules, od_config_t *config, od_logger_t *logger)
 				return -1;
 			}
 		}
+        if (storage->replication == OD_REPLICATION_LOGICAL) {
+            if (storage->replication_dbname == NULL) {
+                od_error(logger, "rules", NULL, NULL,
+                         "storage '%s': no dbname is specified for logical replication",
+                         storage->name);
+                return -1;
+            }
+        }
 	}
 
 	/* rules */
