@@ -13,11 +13,11 @@ script:
 - cd test
 - "./odyssey_test"
 before_deploy:
-  - tar -zcf odyssey.linux-amd64.tar.gz -C odyssey odyssey
+  - tar -zcf odyssey.linux-amd64.$TRAVIS_TAG.tar.gz -C odyssey odyssey
 deploy:
   provider: releases
   api_key:
     secure: bMfBmxGqwS2H0qRchiYBdssZa2d9is7lMoF2+79kndQ0Ap9DQ7akvPPPaxN7q0Q58a/xUeswEGlGt6DgpWn03c2Eyrp/TYyfXDB9Q/IipLl3DgppOwuQ7tyFsbRmAFwOofyACSCq66SRdzAbs0QsFLhWkBcuWE8QppGUOtMbaqw240TysUM54fWBUGWJkh31ywTV1RaRnayfO9Xo0NzZ/Vh/WTAl9vQc1ZEjAT4TyGirznCXkQ7szSpJaPBDPOtxhQpzPVq4i3c2MNZvcudeeCEzOk2Au16NdT74YU/v9HrVFgazMatFAMILVOr4ZgAFpkgnXjAX4Q5Arg9FR50Dpv47BDacTU/l88fO+M4yjp4RtfCsropN3utM9/+AKPqkR8cvMMsqLgyVfcLbGCMFb7kN4jsL9b3qWIpNOwVP3mbiIq2bTI/rplgR051Zyl78CaDrUocVojkCnl2CfrEnJp4TJSqD3UFopux7geoOmEJCqGW80i4A7IJMYrKtldTqFbXVJ6+qnqfmbb5XE8SSg5LcxVImFJMz8mCINEsAvPY+kYZ1kyBFg4Gn0AG465G399YOedNZq48yVZdKNK+f/lgEtRSsBiPJpm1O0BiTzpK8guv3lYS6CqB+KV+hSgO1nq9RDqxl6akJDN8MR4BzJrxQJWTH3VQmGMV/ZGT+rNg=
-  file: odyssey.linux-amd64.tar.gz
+  file: odyssey.linux-amd64.$TRAVIS_TAG.tar.gz
   on:
     repo: x4m/odyssey
