@@ -10,7 +10,9 @@ branches:
 script:
 - cmake -DCMAKE_BUILD_TYPE=Release
 - make -j2
-- "./test/odyssey_test"
+- cd test
+- "./odyssey_test"
+- cd ..
 before_deploy:
   - tar -zcf odyssey.linux-amd64.$TRAVIS_TAG.tar.gz -C odyssey odyssey
 deploy:
