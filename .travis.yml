@@ -14,7 +14,7 @@ script:
 - "./odyssey_test"
 - cd ..
 before_deploy:
-  - tar -zcf odyssey.linux-amd64.$TRAVIS_TAG.tar.gz -C odyssey odyssey
+  - tar -zcf odyssey.linux-amd64.$TRAVIS_TAG.tar.gz -C sources odyssey
 deploy:
   provider: releases
   api_key:
