@@ -24,6 +24,14 @@ elseif("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
     set(CMAKE_C_FLAGS "-std=gnu99 -pedantic -Wall -Wextra -Wstrict-aliasing -g -O0")
 endif()
 
+cmake_minimum_required(VERSION 3.13)
+set(CMAKE_XCODE_GENERATE_SCHEME ON)
+set(CMAKE_XCODE_SCHEME_ADDRESS_SANITIZER ON)
+set(CMAKE_XCODE_SCHEME_ADDRESS_SANITIZER_USE_AFTER_RETURN ON)
+
+set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-omit-frame-pointer -fsanitize=address,undefined -fno-sanitize-recover")
+set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address,undefined -fno-sanitize-recover")
+
 string(TOLOWER ${CMAKE_BUILD_TYPE} OD_VERSION_BUILD)
 
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
