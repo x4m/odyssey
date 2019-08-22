@@ -17,6 +17,7 @@
 #include <machinarium.h>
 #include <kiwi.h>
 #include <odyssey.h>
+#include <pam.h>
 
 static inline int
 od_auth_frontend_cleartext(od_client_t *client)
