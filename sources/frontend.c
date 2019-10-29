@@ -18,6 +18,8 @@
 #include <kiwi.h>
 #include <odyssey.h>
 
+#include <time.h>
+
 static inline void
 od_frontend_close(od_client_t *client)
 {
@@ -101,6 +103,8 @@ od_frontend_error_is_too_many_connections(od_client_t *client)
 	return strcmp(error.code, KIWI_TOO_MANY_CONNECTIONS) == 0;
 }
 
+uint64_t z = 1;
+
 static int
 od_frontend_startup(od_client_t *client)
 {
@@ -110,6 +114,25 @@ od_frontend_startup(od_client_t *client)
 	msg = od_read_startup(&client->io, UINT32_MAX);
 	if (msg == NULL)
 		goto error;
+
+
+	struct timespec start;
+	clock_gettime(CLOCK_MONOTONIC, &start);
+
+	while(true) {
+		struct timespec now;
+		clock_gettime(CLOCK_MONOTONIC, &now);
+		if ( (now.tv_sec - start.tv_sec)*(uint64_t)1e9 + (now.tv_nsec - start.tv_nsec) >= 200000000)
+			break;
+
+		for (int x = 1; x < 200000; x++) {
+			z = z / x;
+			z += x;
+		}
+		//if (z == INT32_MIN)
+		//	goto error;
+		//machine_sleep(0);
+	}
 
 	int rc;
 	rc = kiwi_be_read_startup(machine_msg_data(msg),

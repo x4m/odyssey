@@ -42,21 +42,11 @@ typedef struct {
 static stress_t stress;
 static od_histogram_t stress_histogram;
 static int stress_run;
+int success_count;
 
 static inline void
 stress_client_main(void *arg) {
 	stress_client_t *client = arg;
-
-	/* create client io */
-	od_io_prepare(&client->io, machine_io_create(), 8192);
-	if (client->io.io == NULL) {
-		printf("client %d: failed to create io\n", client->id);
-		return;
-	}
-
-	machine_set_nodelay(client->io.io, 1);
-	machine_set_keepalive(client->io.io, 1, 7200);
-
 	/* resolve host */
 	struct addrinfo *ai = NULL;
 	int rc;
@@ -66,67 +56,81 @@ stress_client_main(void *arg) {
 		return;
 	}
 
-	/* connect */
-	rc = machine_connect(client->io.io, ai->ai_addr, UINT32_MAX);
-	freeaddrinfo(ai);
-	if (rc == -1) {
-		printf("client %d: failed to connect\n", client->id);
-		return;
-	}
 
-	printf("client %d: connected\n", client->id);
-
-	/* handle client startup */
-	kiwi_fe_arg_t argv[] = {
-			{"user",        5},
-			{stress.user,   strlen(stress.user) + 1},
-			{"database",    9},
-			{stress.dbname, strlen(stress.dbname) + 1}
-	};
-
-	machine_msg_t *msg;
-	msg = kiwi_fe_write_startup_message(NULL, 4, argv);
-	if (msg == NULL)
-		return;
-
-	rc = od_write(&client->io, msg);
-	if (rc == -1) {
-		printf("client %d: write error: %s\n", client->id,
-		       machine_error(client->io.io));
-		return;
-	}
-
-	rc = machine_write_stop(client->io.io);
-	if (rc == -1) {
-		printf("client %d: write error: %s\n", client->id,
-		       machine_error(client->io.io));
-		return;
-	}
-
-	while (1) {
-		msg = od_read(&client->io, UINT32_MAX);
-		if (msg == NULL) {
-			printf("read error");
+		/* create client io */
+		od_io_prepare(&client->io, machine_io_create(), 8192);
+		if (client->io.io == NULL) {
+			printf("client %d: failed to create io\n", client->id);
 			return;
 		}
-		kiwi_be_type_t type = *(char *) machine_msg_data(msg);
 
-		if (type == KIWI_BE_ERROR_RESPONSE) {
-			printf("Error response: %s\n", (char*)machine_msg_data(msg) + 5);
+		machine_set_nodelay(client->io.io, 1);
+		machine_set_keepalive(client->io.io, 1, 7200);
+
+
+
+
+		/* connect */
+		rc = machine_connect(client->io.io, ai->ai_addr, UINT32_MAX);
+
+		if (rc == -1) {
+			printf("client %d: failed to connect\n", client->id);
 			return;
 		}
-		machine_msg_free(msg);
 
-		if (type == KIWI_BE_READY_FOR_QUERY)
-			break;
-	}
+		//printf("client %d: connected\n", client->id);
 
-	printf("client %d: ready\n", client->id);
+		/* handle client startup */
+		kiwi_fe_arg_t argv[] = {
+				{"user",        5},
+				{stress.user,   strlen(stress.user) + 1},
+				{"database",    9},
+				{stress.dbname, strlen(stress.dbname) + 1}
+		};
 
-	char query[] = "select generate_series(1,10,1)";
+		machine_msg_t *msg;
+		msg = kiwi_fe_write_startup_message(NULL, 4, argv);
+		if (msg == NULL)
+			return;
 
-	/* oltp */
-	while (stress_run) {
+		rc = od_write(&client->io, msg);
+		if (rc == -1) {
+			printf("client %d: write error: %s\n", client->id,
+			       machine_error(client->io.io));
+			return;
+		}
+
+		rc = machine_write_stop(client->io.io);
+		if (rc == -1) {
+			printf("client %d: write error: %s\n", client->id,
+			       machine_error(client->io.io));
+			return;
+		}
+
+		while (1) {
+			msg = od_read(&client->io, 10000);
+			if (msg == NULL) {
+				printf("read error\n");
+				return;
+			}
+			kiwi_be_type_t type = *(char *) machine_msg_data(msg);
+
+			if (type == KIWI_BE_ERROR_RESPONSE) {
+				printf("Error response: %s\n", (char *) machine_msg_data(msg) + 5);
+				return;
+			}
+			machine_msg_free(msg);
+
+			if (type == KIWI_BE_READY_FOR_QUERY)
+				break;
+		}
+
+		//printf("client %d: ready\n", client->id);
+
+		char query[] = "select generate_series(1,10,1)";
+
+		/* oltp */
+
 		int start_time = od_histogram_time_us();
 
 		/* request */
@@ -159,23 +163,26 @@ stress_client_main(void *arg) {
 				int execution_time = od_histogram_time_us() - start_time;
 				od_histogram_add(&stress_histogram, execution_time);
 				client->processed++;
+				success_count++;
 				break;
 			}
 		}
-	}
 
-	/* finish */
-	msg = kiwi_fe_write_terminate(NULL);
-	if (msg == NULL)
-		return;
-	rc = od_write(&client->io, msg);
-	if (rc == -1) {
-		printf("client %d: write error: %s\n", client->id,
-		       machine_error(client->io.io));
-		return;
-	}
 
-	machine_close(client->io.io);
+		/* finish */
+		msg = kiwi_fe_write_terminate(NULL);
+		if (msg == NULL)
+			return;
+		rc = od_write(&client->io, msg);
+		if (rc == -1) {
+			printf("client %d: write error: %s\n", client->id,
+			       machine_error(client->io.io));
+			return;
+		}
+
+		machine_close(client->io.io);
+
+	freeaddrinfo(ai);
 	printf("client %d: done (%d processed)\n", client->id, client->processed);
 }
 
@@ -286,6 +293,7 @@ int main(int argc, char *argv[]) {
 	machine = machine_create("stresser", stress_main, &stress);
 
 	machine_wait(machine);
+	printf("success_count        %d\n", success_count);
 
 	machinarium_free();
 	return 0;
