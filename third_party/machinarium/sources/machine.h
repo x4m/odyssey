@@ -24,6 +24,7 @@ struct mm_machine
 	mm_coroutine_cache_t coroutine_cache;
 	mm_loop_t            loop;
 	mm_list_t            link;
+	SSL_CTX             *tls_ctx;
 };
 
 extern __thread mm_machine_t *mm_self;

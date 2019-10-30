@@ -40,7 +40,6 @@ struct mm_io
 	int             opt_keepalive_delay;
 	/* tls */
 	mm_tls_t       *tls;
-	SSL_CTX        *tls_ctx;
 	SSL            *tls_ssl;
 	int             tls_error;
 	char            tls_error_msg[128];
