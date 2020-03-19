@@ -29,11 +29,11 @@ server(void *arg)
 	tls = machine_tls_create();
 	rc = machine_tls_set_verify(tls, "none");
 	test(rc == 0);
-	rc = machine_tls_set_ca_file(tls, "./machinarium/ca.crt");
+	rc = machine_tls_set_ca_file(tls, "/etc/pgbouncer/ssl/allCAs.pem");
 	test(rc == 0);
-	rc = machine_tls_set_cert_file(tls, "./machinarium/server.crt");
+	rc = machine_tls_set_cert_file(tls, "/etc/pgbouncer/ssl/server.crt");
 	test(rc == 0);
-	rc = machine_tls_set_key_file(tls, "./machinarium/server.key");
+	rc = machine_tls_set_key_file(tls, "/etc/pgbouncer/ssl/server.key");
 	test(rc == 0);
 	rc = machine_set_tls(client, tls, UINT32_MAX);
 	if (rc == -1) {
